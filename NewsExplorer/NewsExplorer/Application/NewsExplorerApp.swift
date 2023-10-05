@@ -9,7 +9,7 @@ import SwiftUI
 
 @main
 struct NewsExplorerApp: App {
-    @StateObject private var viewModel = MainNewsViewModel()
+    @StateObject private var viewModel = MainNewsViewModel(appContainer: AppContainerImpl())
   
     var body: some Scene {
         WindowGroup {

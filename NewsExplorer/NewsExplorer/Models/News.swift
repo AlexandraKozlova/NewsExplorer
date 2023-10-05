@@ -9,9 +9,10 @@ import Foundation
 
 struct News: Identifiable {
     let id: String
-    let author: String
+    let author: String?
     let title: String
-    let description: String
+    let description: String?
     let publishedAt: String
     let source: String
+    let imageURL: String?
 }

@@ -11,6 +11,7 @@ struct SearchBarView: View {
     
     @Binding var searchingText: String
     
+    // MARK: - Body
     var body: some View {
         HStack {
             Image(systemName: "magnifyingglass")
@@ -18,7 +19,7 @@ struct SearchBarView: View {
                     searchingText.isEmpty ?
                     Color.secondary : Color.black
                 )
-            TextField("Search by title", text: $searchingText)
+            TextField("Bitcoin...", text: $searchingText)
                 .foregroundColor(Color.black)
                 .disableAutocorrection(true)
                 .overlay(
@@ -46,6 +47,7 @@ struct SearchBarView: View {
     }
 }
 
+// MARK: - Preview
 struct SearchBarView_Previews: PreviewProvider {
     static var previews: some View {
         SearchBarView(searchingText: .constant(""))

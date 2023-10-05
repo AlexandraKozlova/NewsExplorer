@@ -10,28 +10,35 @@ import Foundation
 
 protocol NetworkServiceProvider {
     associatedtype E: Endpoint
-
-    func execute(endpoint: E) -> AnyPublisher<Void, NetworkError>
+    
+    func execute<Model: Decodable>(endpoint: E) -> AnyPublisher<Model, NetworkError>
 }
 
-class NetworkServiceProviderImpl<E: Endpoint>: NetworkServiceProvider {
-    private let baseURL: URL
+final class NetworkServiceProviderImpl<E: Endpoint>: NetworkServiceProvider {
+    // MARK: - Properties
     private let networkManager: NetworkManager
     private let encoder: JSONEncoder
+    private let decoder: JSONDecoder
 
-    init(baseURL: URL,
-         networkManager: NetworkManager,
-         encoder: JSONEncoder) {
-        self.baseURL = baseURL
+    // MARK: - Init
+    init(networkManager: NetworkManager,
+         encoder: JSONEncoder,
+         decoder: JSONDecoder) {
         self.networkManager = networkManager
         self.encoder = encoder
+        self.decoder = decoder
     }
-
-    func execute(endpoint: E) -> AnyPublisher<Void, NetworkError> {
+    
+    // MARK: - Internal
+    func execute<Model: Decodable>(endpoint: E) -> AnyPublisher<Model, NetworkError> {
+        guard let baseURL = endpoint.baseURL else { return Fail(error: NetworkError.badRequest).eraseToAnyPublisher() }
+      
         do {
-            let request = try endpoint.build(baseURL: baseURL, encoder: encoder)
+            let request = try endpoint.build(
+                baseURL: baseURL,
+                encoder: encoder)
             return networkManager.execute(request: request)
-                .map { _ in }
+                .decode(type: Model.self, decoder: decoder)
                 .mapError { [unowned self] error -> NetworkError in
                     let mappedError = handleError(error)
                     debugPrint(mappedError.errorDescription ?? "")
@@ -47,8 +54,11 @@ class NetworkServiceProviderImpl<E: Endpoint>: NetworkServiceProvider {
                 .eraseToAnyPublisher()
         }
     }
+}
 
-    private func handleError(_ error: Error) -> NetworkError {
+// MARK: - Private setup
+private extension NetworkServiceProvider {
+    func handleError(_ error: Error) -> NetworkError {
         switch error {
         case let error as Swift.DecodingError:
             return .decodingError(error)

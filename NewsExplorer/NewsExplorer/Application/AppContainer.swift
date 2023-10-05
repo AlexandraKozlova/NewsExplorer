@@ -8,21 +8,26 @@
 import Foundation
 
 protocol AppContainer: AnyObject {
-//    let newsNetworkService: NewsNetworkService { get }
+    var newsNetworkService: NewsNetworkService { get }
+    var newsService: NewsService { get }
 }
 
 final class AppContainerImpl: AppContainer {
-//    let newsNetworkService: NewsNetworkService
+    let newsNetworkService: NewsNetworkService
+    let newsService: NewsService
     
     init() {
-//        let newsNetworkServiceProvider = NetworkServiceProviderImpl<AuthEndPoint>(
-//            baseURLStorage: appConfiguration,
-//            networkManager: networkManagerImpl,
-//            encoder: JSONEncoder(),
-//            decoder: JSONDecoder(),
-//            plugins: []
-//        )
-//        let newsNetworkService = NewsNetworkServiceImpl(newsProvider: authNetworkServiceProvider)
-//        self.newsNetworkService = newsNetworkService
+        let networkManagerImpl = NetworkManagerImpl(session: URLSession.shared)
+        
+        let newsNetworkServiceProvider = NetworkServiceProviderImpl<NewsEndPoint>(
+            networkManager: networkManagerImpl,
+            encoder: JSONEncoder(),
+            decoder: JSONDecoder()
+        )
+        let newsNetworkService = NewsNetworkServiceImpl(newsProvider: newsNetworkServiceProvider)
+        self.newsNetworkService = newsNetworkService
+        
+        let newsService = NewsServiceImpl(newsNetworkService: newsNetworkService)
+        self.newsService = newsService
     }
 }
