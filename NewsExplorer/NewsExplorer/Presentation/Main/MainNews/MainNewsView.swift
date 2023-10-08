@@ -25,6 +25,14 @@ struct MainNewsView: View {
     @State private var selectedDate = Date()
     @State private var showDatePicker = false
     
+    private var september2023: Date {
+        var components = DateComponents()
+        components.year = 2023
+        components.month = 9
+        components.day = 1
+        return Calendar.current.date(from: components)!
+    }
+    
     // MARK: - Body
     var body: some View {
         ZStack {
@@ -141,6 +149,7 @@ private extension MainNewsView {
     var datePickerView: some View {
         DatePicker("",
                    selection: isStartDatePickerVisible ? $startDate : $endDate,
+                   in: september2023...,
                    displayedComponents: .date)
         .datePickerStyle(.graphical)
         .padding(.horizontal, 30)

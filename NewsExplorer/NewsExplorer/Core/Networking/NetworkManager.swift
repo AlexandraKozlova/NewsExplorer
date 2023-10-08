@@ -20,13 +20,14 @@ class NetworkManagerImpl: NetworkManager {
     }
 
     func execute(request: URLRequest) -> AnyPublisher<Data, Error> {
+        print("HERE", request.url)
         return session.dataTaskPublisher(for: request)
             .tryMap { [unowned self] data, response in
              
                 guard let response = response as? HTTPURLResponse else {
                     throw NetworkError.noResponse
                 }
-                print("[\(response.statusCode)] '\(request.url!)'")
+//                print("[\(response.statusCode)] '\(request.url!)'")
 
                 if !(200 ... 299).contains(response.statusCode) {
                     throw httpError(response.statusCode)

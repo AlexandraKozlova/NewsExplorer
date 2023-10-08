@@ -11,7 +11,7 @@ import Combine
 final class MainNewsViewModel: ObservableObject {
     // MARK: - Published
     @Published var searchingText = ""
-    @Published var allNews: [News] = [News(id: "", author: "hygfhdj", title: "hfugvj", description: "hdfuhnfdjsdcv", publishedAt: "hfduvc", source: "hfduvcjn", imageURL: "dfhujd")]
+    @Published var allNews: [News] = []
     @Published var sortOption: SortOption = .relevancy
     @Published var startDate: Date? = nil
     @Published var endDate: Date? = nil
@@ -42,19 +42,22 @@ private extension MainNewsViewModel {
             .store(in: &cancellableSet)
         
         $sortOption
+            .debounce(for: .seconds(0.5), scheduler: DispatchQueue.main)
             .sink { [weak self] sortOption in
                 self?.loadNews()
             }
             .store(in: &cancellableSet)
         
         $startDate
-            .sink { [weak self] sortOption in
+            .debounce(for: .seconds(0.5), scheduler: DispatchQueue.main)
+            .sink { [weak self] startDate in
                 self?.loadNews()
             }
             .store(in: &cancellableSet)
         
         $endDate
-            .sink { [weak self] sortOption in
+            .debounce(for: .seconds(0.5), scheduler: DispatchQueue.main)
+            .sink { [weak self] startDate in
                 self?.loadNews()
             }
             .store(in: &cancellableSet)
@@ -67,16 +70,15 @@ private extension MainNewsViewModel {
                                 sortBy: sortBy,
                                 startDate: startDate?.formattedDateTo(format: .yyyy_MM_dd),
                                 endDate: endDate?.formattedDateTo(format: .yyyy_MM_dd))
-//        allNews.removeAll()
+        allNews.removeAll()
         
-        
-//        newsService.getNewsFor(newsModel: model)
-//            .receive(on: DispatchQueue.main)
-//            .sink { error in
-//                print(error)
-//            } receiveValue: { news in
-//                self.allNews = news
-//            }
-//            .store(in: &cancellableSet)
+        newsService.getNewsFor(newsModel: model)
+            .receive(on: DispatchQueue.main)
+            .sink { error in
+                print(error)
+            } receiveValue: { news in
+                self.allNews = news
+            }
+            .store(in: &cancellableSet)
     }
 }

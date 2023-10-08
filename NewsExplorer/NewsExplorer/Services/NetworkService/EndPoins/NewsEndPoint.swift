@@ -33,7 +33,7 @@ enum NewsEndPoint: Endpoint {
                 return ["q": model.topic,
                         "sortBy" : model.sortBy]
             }
-            
+
             return ["q": model.topic,
                     "sortBy" : model.sortBy,
                     "from" : startDate,

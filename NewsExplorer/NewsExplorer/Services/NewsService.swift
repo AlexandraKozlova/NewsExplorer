@@ -36,6 +36,7 @@ final class NewsServiceImpl: NewsService {
                         promise(.failure(failure))
                     }
                 }, receiveValue: { news in
+                    self.allNews.removeAll()
                     for article in news.articles {
                         
                         self.allNews.append(News(id: UUID().uuidString,
